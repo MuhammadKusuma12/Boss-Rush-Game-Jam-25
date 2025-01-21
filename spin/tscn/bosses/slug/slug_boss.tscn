@@ -1,72 +1,100 @@
-[gd_scene load_steps=8 format=3 uid="uid://ej6qcd3x0rwp"]
+[gd_scene load_steps=11 format=3 uid="uid://ej6qcd3x0rwp"]
 
 [ext_resource type="Script" path="res://tscn/bosses/slug/slug_boss.gd" id="1_xl808"]
 [ext_resource type="PackedScene" uid="uid://53pipeymrjj4" path="res://tscn/components/boss_nav.tscn" id="2_e1y7k"]
+[ext_resource type="PackedScene" uid="uid://dwdo7neuu6y5r" path="res://tscn/components/boss_behaviour.tscn" id="3_0enfc"]
 [ext_resource type="Script" path="res://tscn/bosses/slug/pattern_1.gd" id="3_f80ov"]
+[ext_resource type="Script" path="res://tscn/bosses/slug/move_behaviour.gd" id="5_koji3"]
+[ext_resource type="Script" path="res://tscn/bosses/slug/docile_behaviour.gd" id="6_dug6q"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6ja10"]
-size = Vector2(194, 117)
+size = Vector2(38, 31)
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_qjyro"]
 
-[sub_resource type="GDScript" id="GDScript_abs8m"]
+[sub_resource type="GDScript" id="GDScript_6ih4o"]
+resource_name = "boss1_hitbox"
 script/source = "extends Area2D
 
+@onready var boss = self.get_parent()
+
 func _on_area_entered(area: Area2D) -> void:
-	if area.name == \"player_shape\":
-		$\"../boss_nav\".nav_enabled = false
-
-
-func _on_area_exited(area: Area2D) -> void:
-	if area.name == \"player_shape\":
-		$\"../boss_nav\".nav_enabled = true
+	if area.name == \"hitrange\":
+		boss.hp -= 20
+		$\"../hpbar\".value = boss.hp
+		print(boss.hp)
 "
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_evmeo"]
-radius = 890.001
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mmlk0"]
+size = Vector2(95.5, 28.5)
 
 [node name="slug_boss" type="CharacterBody2D"]
 collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_xl808")
-SPEED = 100.0
+SPEED = 50.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(37, 78.5)
+position = Vector2(-1, 62)
 shape = SubResource("RectangleShape2D_6ja10")
 
 [node name="Sprites" type="Node2D" parent="."]
 
 [node name="torso" type="Sprite2D" parent="Sprites"]
 position = Vector2(0, 63)
-scale = Vector2(495.5, 149.5)
+scale = Vector2(192.457, 57.5321)
 texture = SubResource("PlaceholderTexture2D_qjyro")
 
 [node name="shell" type="Sprite2D" parent="Sprites"]
-position = Vector2(105, -95)
-scale = Vector2(243, 179)
+position = Vector2(45, 15)
+scale = Vector2(103.359, 64.5564)
 texture = SubResource("PlaceholderTexture2D_qjyro")
 
 [node name="boss_nav" parent="." instance=ExtResource("2_e1y7k")]
 radius = 30.0
 
-[node name="movement_boundary" type="Area2D" parent="."]
-visible = false
-script = SubResource("GDScript_abs8m")
+[node name="Behaviour" parent="." node_paths=PackedStringArray("initBehaviour") instance=ExtResource("3_0enfc")]
+initBehaviour = NodePath("Move")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="movement_boundary"]
-shape = SubResource("CircleShape2D_evmeo")
-
-[node name="Attacks" type="Node" parent="."]
-
-[node name="Pattern1" type="Node" parent="Attacks" node_paths=PackedStringArray("slug")]
+[node name="Attack1" type="Node" parent="Behaviour" node_paths=PackedStringArray("slug", "boss_nav")]
 script = ExtResource("3_f80ov")
 slug = NodePath("../..")
+boss_nav = NodePath("../../boss_nav")
 
-[node name="Rate" type="Timer" parent="Attacks/Pattern1"]
-wait_time = 0.8
-autostart = true
+[node name="Rate" type="Timer" parent="Behaviour/Attack1"]
+wait_time = 0.5
 
-[connection signal="area_entered" from="movement_boundary" to="movement_boundary" method="_on_area_entered"]
-[connection signal="area_exited" from="movement_boundary" to="movement_boundary" method="_on_area_exited"]
-[connection signal="timeout" from="Attacks/Pattern1/Rate" to="Attacks/Pattern1" method="_on_rate_timeout"]
+[node name="Move" type="Node" parent="Behaviour" node_paths=PackedStringArray("boss_nav")]
+script = ExtResource("5_koji3")
+boss_nav = NodePath("../../boss_nav")
+
+[node name="Duration" type="Timer" parent="Behaviour/Move"]
+wait_time = 3.0
+one_shot = true
+
+[node name="Docile" type="Node" parent="Behaviour" node_paths=PackedStringArray("boss_nav")]
+script = ExtResource("6_dug6q")
+boss_nav = NodePath("../../boss_nav")
+
+[node name="Duration" type="Timer" parent="Behaviour/Docile"]
+wait_time = 5.0
+one_shot = true
+
+[node name="hpbar" type="ProgressBar" parent="."]
+offset_left = -127.0
+offset_top = -87.0
+offset_right = 124.0
+offset_bottom = -37.0
+value = 100.0
+
+[node name="hitbox" type="Area2D" parent="."]
+script = SubResource("GDScript_6ih4o")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="hitbox"]
+position = Vector2(-32.75, 73.25)
+shape = SubResource("RectangleShape2D_mmlk0")
+
+[connection signal="timeout" from="Behaviour/Attack1/Rate" to="Behaviour/Attack1" method="_on_rate_timeout"]
+[connection signal="timeout" from="Behaviour/Move/Duration" to="Behaviour/Move" method="_on_duration_timeout"]
+[connection signal="timeout" from="Behaviour/Docile/Duration" to="Behaviour/Docile" method="_on_duration_timeout"]
+[connection signal="area_entered" from="hitbox" to="hitbox" method="_on_area_entered"]

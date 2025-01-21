@@ -1,17 +1,14 @@
 [gd_scene load_steps=4 format=3 uid="uid://2xwlfmqvavl1"]
 
-[ext_resource type="Texture2D" uid="uid://du70y3oc5d48b" path="res://placeholder tileset 16x16.png" id="1_evday"]
+[ext_resource type="Texture2D" uid="uid://cgr1if2q0ee8" path="res://asset/Red_Tile.png" id="2_atltu"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xju6g"]
-texture = ExtResource("1_evday")
-8:4/size_in_atlas = Vector2i(4, 4)
-8:4/0 = 0
-0:12/size_in_atlas = Vector2i(4, 4)
-0:12/0 = 0
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qtfnv"]
+texture = ExtResource("2_atltu")
+2:1/0 = 0
+0:3/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_36s72"]
-tile_size = Vector2i(64, 64)
-sources/0 = SubResource("TileSetAtlasSource_xju6g")
+sources/1 = SubResource("TileSetAtlasSource_qtfnv")
 
 [node name="GroundData" type="TileMapLayer"]
 modulate = Color(0.219608, 1, 0.294118, 1)

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dwdo7neuu6y5r"]
+
+[ext_resource type="Script" path="res://tscn/components/boss_behaviour.gd" id="1_i3fs5"]
+
+[node name="Behaviour" type="Node"]
+script = ExtResource("1_i3fs5")

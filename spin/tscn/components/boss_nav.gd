@@ -2,7 +2,7 @@ extends NavigationAgent2D
 class_name BossNav
 
 @onready var boss = self.get_parent() as Boss
-var nav_enabled := true
+var nav_enabled := false
 
 func _physics_process(delta: float) -> void:
 	var dir = boss.to_local(get_next_path_position()).normalized()
